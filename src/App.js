@@ -10,6 +10,12 @@ function App() {
     { id: 4, title: "Write tests", status: "done" }
   ]);
 
+  const todoTasks = tasks.filter(task => task.status === 'todo');
+  
+  const inProgressTasks = tasks.filter(task => task.status === 'in-progress');
+
+  const doneTasks = tasks.filter(task => task.status === 'done');
+
   return (
     <div className="app-container">
       <header className="app-header">
