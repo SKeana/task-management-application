@@ -11,9 +11,7 @@ function App() {
   ]);
 
   const todoTasks = tasks.filter(task => task.status === 'todo');
-  
   const inProgressTasks = tasks.filter(task => task.status === 'in-progress');
-
   const doneTasks = tasks.filter(task => task.status === 'done');
 
   return (
@@ -25,12 +23,27 @@ function App() {
         {/* <PlanningBox /> Commenting out for now */}
         <div className='columns-to-do' id='todo'>
           <h2>Task that need to be done</h2>
+          {todoTasks.map(task => (
+            <div key={task.id} className="task-card">
+              {task.title}
+            </div>
+          ))}
         </div>
         <div className='columns-in-progress' id='in-progress'>
           <h2>Task that need more work</h2>
+          {inProgressTasks.map(task => (
+            <div key={task.id} className="task-card">
+              {task.title}
+            </div>
+          ))}
         </div>
         <div className='columns-done' id='done'>
           <h2>Tasks that are done</h2>
+          {doneTasks.map(task => (
+            <div key={task.id} className="task-card">
+              {task.title}
+            </div>
+          ))}
         </div>
       </main>
     </div>
