@@ -10,6 +10,21 @@ function App() {
     { id: 4, title: "Write tests", status: "done" }
   ]);
 
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if(newTaskTitle.trim === "") return;
+    const newTask = {
+      id: tasks.length + 1,
+      title: newTaskTitle,
+      status: 'todo'
+    };
+
+    setTasks([...tasks, newTask]);
+    newTaskTitle("");
+  }
+
   const todoTasks = tasks.filter(task => task.status === 'todo');
   const inProgressTasks = tasks.filter(task => task.status === 'in-progress');
   const doneTasks = tasks.filter(task => task.status === 'done');
@@ -20,6 +35,12 @@ function App() {
         <h1>Task Management</h1>
       </header>
       <main className="app-main">
+
+        <form onSubmit={handleSubmit}>
+          <input type='text' placeholder='Enter new tasks' value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)}/>
+          <button type='submit'>Add new task</button>
+        </form>
+
         {/* <PlanningBox /> Commenting out for now */}
         <div className='columns-to-do' id='todo'>
           <h2>Task that need to be done</h2>
