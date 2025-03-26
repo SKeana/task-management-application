@@ -85,12 +85,6 @@
   transition: background-color 0.2s ease; /* For drag over feedback */
 }
 
-/* Specific column classes (optional for overrides) */
-.columns-to-do {}
-.columns-in-progress {}
-.columns-done {}
-
-
 /* Column Headers */
 .column h2 {
   margin: 0 0 0.75rem 0;
