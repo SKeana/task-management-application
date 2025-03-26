@@ -1,58 +1,130 @@
-.app-main {
-  display: flex;
-  gap: 20px;
-  padding: 20px;
+/* App.css */
+
+/* Basic App Layout */
+.app-container {
+  font-family: sans-serif;
 }
 
-.columns-to-do,
-.columns-in-progress,
-.columns-done {
-  flex: 1;
-  min-width: 250px;
-  background-color: #f4f5f7;
-  border-radius: 5px;
-  padding: 10px;
-}
-
-.columns-to-do h2,
-.columns-in-progress h2,
-.columns-done h2 {
-  margin: 0 0 10px 0;
-  font-size: 18px;
-  color: #333;
-}
-
-.task-card {
-  background-color: white;
-  border-radius: 3px;
-  padding: 10px;
-  margin-bottom: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-form {
-  display: flex;
-  gap: 10px;
+.app-header {
+  background-color: #4a4a4a;
+  color: white;
+  padding: 15px 20px;
+  text-align: center;
   margin-bottom: 20px;
 }
 
-form input {
-  flex: 1;
-  padding: 8px;
+.app-header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+/* Main content area - Just provides padding now */
+.app-main {
+  padding: 20px;
+  /* REMOVED display: flex and gap from here */
+}
+
+/* Form Styling */
+.add-task-form {
+  width: 100%; /* Take full width */
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px; /* Space below form */
+}
+
+.add-task-form input[type="text"] {
+  flex-grow: 1;
+  padding: 8px 12px;
   border: 1px solid #ccc;
-  border-radius: 3px;
+  border-radius: 4px;
   font-size: 14px;
 }
 
-form button {
+.add-task-form button {
   padding: 8px 16px;
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 3px;
+  border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
 }
 
-form button:hover {
+.add-task-form button:hover {
   background-color: #0056b3;
+}
+
+
+/* --- THIS IS NOW THE FLEX CONTAINER FOR COLUMNS --- */
+.columns-container {
+  display: flex; /* Arrange columns horizontally */
+  gap: 20px; /* Space BETWEEN columns */
+  width: 100%; /* Ensure it uses available width */
+  align-items: flex-start; /* Align columns at the top */
+}
+/* --- END FLEX CONTAINER FOR COLUMNS --- */
+
+
+/* Generic Column Styling */
+.column {
+  flex: 1; /* Each column shares space equally */
+  min-width: 280px; /* Minimum width before wrapping */
+  background-color: #f4f5f7;
+  border-radius: 8px;
+  padding: 15px;
+  /* min-height removed, height will depend on content + flex alignment */
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Space between items INSIDE column */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Specific column classes (can be used for overrides if needed) */
+.columns-to-do { /* e.g., border-top: 3px solid blue; */ }
+.columns-in-progress { /* e.g., border-top: 3px solid orange; */ }
+.columns-done { /* e.g., border-top: 3px solid green; */ }
+
+
+/* Column Headers */
+.column h2 { /* Target h2 within any .column */
+  margin: 0 0 10px 0;
+  padding-bottom: 10px;
+  font-size: 18px;
+  color: #172b4d;
+  text-align: center;
+  border-bottom: 2px solid #dfe1e6;
+  flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+/* Task Card Styling */
+.task-card {
+  background-color: white;
+  border-radius: 4px;
+  padding: 12px 15px;
+  /* margin-bottom: 8px; */ /* Gap in parent column handles spacing */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  cursor: grab;
+  transition: box-shadow 0.2s ease-in-out;
+  font-size: 14px;
+  color: #172b4d;
+}
+
+.task-card:hover {
+   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.task-card:active {
+  cursor: grabbing;
+}
+
+/* Optional: Style for empty column placeholder */
+.empty-column-placeholder {
+  text-align: center;
+  color: #5e6c84;
+  padding: 20px;
+  border: 2px dashed #c1c7d0;
+  border-radius: 4px;
+  margin-top: 10px;
+  font-size: 14px;
 }
