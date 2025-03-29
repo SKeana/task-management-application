@@ -1,20 +1,24 @@
-// 1. Import the Express library
 const express = require('express');
-
-// 2. Create an instance of the Express application
 const app = express();
-
-// 3. Define the port the server will listen on
-// Use an environment variable if available, otherwise default to 3001
-// (Using 3001 to avoid conflict with React's default 3000)
 const PORT = process.env.PORT || 3001;
 
-// 4. A simple route for the root URL '/' to test
-app.get('/', (req, res) => {
-  res.send('Hello from Task Board Backend!'); // Send a simple text response
+let tasks = [
+  { id: 1, title: "Design homepage", status: "todo" },
+  { id: 2, title: "Set up database", status: "in-progress" },
+  { id: 3, title: "Write API endpoints", status: "in-progress" },
+  { id: 4, title: "Write tests", status: "done" }
+];
+
+
+app.get('/api/tasks', (req, res) => {
+  console.log("Request received for GET /api/task");
+  res.json(tasks);
 });
 
-// 5. Start the server and make it listen on the specified port
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.get('/', (req, res) => {
+  res.send('hello form taskbord backend use /api/tasks');
+});
+
+app.listen(PORT, () =>{
+  console.log(`Server is running http://localhost:${PORT}`);
 });
