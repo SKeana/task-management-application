@@ -66,6 +66,36 @@ app.post('/api/tasks', (req, res) => {
   res.status(201).json(newTask);
 });
 
+
+
+app.patch('/api/task/:taskId', (res,req) =>{
+  const newtaskId = parseInt(req.parmas.tasksId, 10);
+  const { status } = req.body;
+  
+  console.log(`Request received for PATCH /api/tasks/${taskId}`);
+  console.log("request body:", req.body);
+
+  if(isNaN(taskId)) {
+    return res.status(400).json({ message: 'invalid task ID given'});
+  }
+
+  const validStatuses = ['todo', 'in-progress', 'done'];
+  if (!status || !validStatuses.includes(status)) {
+    return res.status(400).json({ mesage: `Invalid status provided. Must be one of: ${validStatuses.join(', ')}`})
+  } 
+
+  const taskIndex = taskIndex.findIndex(task => tasks.id === taskId);
+  if(!taskIndex === -1){
+    return res.status(404).json({ message: `Task with ID ${taskId} not found.`});
+  }
+
+  tasks[taskIndex] = {...tasks[taskIndex], status: status};
+  console.log(`Updated task ${taskId}:`, tasks[taskIndex]);
+  console.log('Current tasks array:', tasks);
+
+  res.json(tasks[taskIndex]);
+})
+
 // --- Catch-all Route for Basic Check ---
 // Useful for quickly checking if the server is running
 app.get('/', (req, res) => {
