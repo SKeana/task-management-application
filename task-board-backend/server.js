@@ -1,24 +1,79 @@
+// server.js
+
+// 1. Import Dependencies
 const express = require('express');
+
+// 2. Create Express App Instance
 const app = express();
+
+// 3. Define Port
 const PORT = process.env.PORT || 3001;
 
+// --- In-Memory Task Storage ---
 let tasks = [
   { id: 1, title: "Design homepage", status: "todo" },
   { id: 2, title: "Set up database", status: "in-progress" },
   { id: 3, title: "Write API endpoints", status: "in-progress" },
   { id: 4, title: "Write tests", status: "done" }
 ];
+let nextTaskId = 5; // Variable to generate simple unique IDs
+// -----------------------------
 
+// --- Middleware ---
+// IMPORTANT: Parses incoming JSON request bodies. Must be before routes that need it.
+app.use(express.json());
+// ------------------
 
+// --- API Routes ---
+
+// GET /api/tasks - Fetch all tasks
 app.get('/api/tasks', (req, res) => {
-  console.log("Request received for GET /api/task");
+  // This function runs when a GET request hits /api/tasks
+  console.log('Request received for GET /api/tasks');
+
+  // Send the 'tasks' array back as a JSON response (status 200 OK is default)
   res.json(tasks);
 });
 
-app.get('/', (req, res) => {
-  res.send('hello form taskbord backend use /api/tasks');
+// POST /api/tasks - Create a new task
+app.post('/api/tasks', (req, res) => {
+  // This function runs when a POST request hits /api/tasks
+  console.log('Request received for POST /api/tasks');
+  console.log('Request Body:', req.body); // Log the parsed body
+
+  // 1. Extract the title from the request body (thanks to express.json())
+  const { title } = req.body;
+
+  // 2. Basic Server-Side Validation
+  if (!title || typeof title !== 'string' || title.trim() === '') {
+    // If validation fails, send a 400 Bad Request error response
+    return res.status(400).json({ message: 'Task title is required and must be a non-empty string.' });
+  }
+
+  // 3. Create the new task object
+  const newTask = {
+    id: nextTaskId++, // Use the current ID, then increment for the next one
+    title: title.trim(), // Use the validated & trimmed title
+    status: 'todo'      // Default status for new tasks
+  };
+
+  // 4. Add the new task to our in-memory array
+  tasks.push(newTask);
+  console.log('Updated tasks array:', tasks);
+
+  // 5. Send the newly created task back as the response
+  // Use 201 Created status code for successful resource creation
+  res.status(201).json(newTask);
 });
 
-app.listen(PORT, () =>{
-  console.log(`Server is running http://localhost:${PORT}`);
+// --- Catch-all Route for Basic Check ---
+// Useful for quickly checking if the server is running
+app.get('/', (req, res) => {
+  res.send('Hello from Task Board Backend! Use /api/tasks');
+});
+
+// --- Start Server ---
+// Make the server listen for requests on the specified port
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
