@@ -1,9 +1,10 @@
-// server.js (Working with MongoDB)
+// task-board-backend/server.js
 
 // 1. Import Dependencies
 const express = require('express');
 const mongoose = require('mongoose');
-const Task = require('./models/Task'); // 1. Import the Task model
+const Task = require('./models/Task');
+const cors = require('cors'); // Import CORS package
 
 // 2. Create Express App Instance
 const app = express();
@@ -18,6 +19,10 @@ const MONGO_URI = 'mongodb+srv://skean2000:<db_password>@cluster0.xfnkesd.mongod
 // ---------------------------------
 
 // --- Middleware ---
+// Enable CORS for all origins (for development)
+// IMPORTANT: For production, configure CORS more restrictively
+app.use(cors());
+
 app.use(express.json()); // Parses incoming JSON request bodies
 // ------------------
 
@@ -39,45 +44,32 @@ mongoose.connect(MONGO_URI)
 // --- API Routes (Using Mongoose Model) ---
 
 // GET /api/tasks - Fetch all tasks from DB
-app.get('/api/tasks', async (req, res) => { // Make handler async
+app.get('/api/tasks', async (req, res) => {
   console.log('Request received for GET /api/tasks');
   try {
-    const tasks = await Task.find(); // 2. Use Task.find() to get all tasks
-    res.status(200).json(tasks);     // Send tasks back as JSON
+    const tasks = await Task.find().sort({ createdAt: 1 }); // Fetch and sort by creation time
+    res.status(200).json(tasks);
   } catch (error) {
     console.error('Error fetching tasks:', error);
-    res.status(500).json({ message: 'Error fetching tasks from database.' }); // 500 Internal Server Error
+    res.status(500).json({ message: 'Error fetching tasks from database.' });
   }
 });
 
 // POST /api/tasks - Create a new task in DB
-app.post('/api/tasks', async (req, res) => { // Make handler async
+app.post('/api/tasks', async (req, res) => {
   console.log('Request received for POST /api/tasks');
   console.log('Request Body:', req.body);
-
   try {
-    const { title } = req.body; // Extract title
-
-    // Basic validation (Mongoose schema also validates)
+    const { title } = req.body;
     if (!title || typeof title !== 'string' || title.trim() === '') {
       return res.status(400).json({ message: 'Task title is required.' });
     }
-
-    // 3. Create a new Task document using the model
-    const newTask = new Task({
-      title: title.trim()
-      // status defaults to 'todo' based on schema
-    });
-
-    // 4. Save the new task to the database
+    const newTask = new Task({ title: title.trim() });
     const savedTask = await newTask.save();
-
     console.log('Task saved:', savedTask);
-    res.status(201).json(savedTask); // Send back the saved task (includes _id, status, timestamps)
-
+    res.status(201).json(savedTask);
   } catch (error) {
     console.error('Error creating task:', error);
-    // Handle potential validation errors from Mongoose
     if (error.name === 'ValidationError') {
         return res.status(400).json({ message: 'Validation Error', errors: error.errors });
     }
@@ -86,45 +78,35 @@ app.post('/api/tasks', async (req, res) => { // Make handler async
 });
 
 // PATCH /api/tasks/:taskId - Update task status in DB
-app.patch('/api/tasks/:taskId', async (req, res) => { // Make handler async
-  const taskId = req.params.taskId; // Task ID from URL (Mongoose handles string conversion)
-  const { status } = req.body;      // New status from body
+app.patch('/api/tasks/:taskId', async (req, res) => {
+  const taskId = req.params.taskId;
+  const { status } = req.body;
   console.log(`Request received for PATCH /api/tasks/${taskId}`);
   console.log('Request Body:', req.body);
 
-  // Validate status (optional here as schema also validates, but good practice)
   const validStatuses = ['todo', 'in-progress', 'done'];
   if (!status || !validStatuses.includes(status)) {
       return res.status(400).json({ message: `Invalid status provided. Must be one of: ${validStatuses.join(', ')}` });
   }
 
   try {
-    // 5. Find task by ID and update its status
     const updatedTask = await Task.findByIdAndUpdate(
-      taskId,              // The _id of the task to find
-      { status: status },  // The update to apply
-      {
-        new: true,         // Return the modified document, not the original
-        runValidators: true // Ensure schema validations (like enum for status) are run
-      }
+      taskId,
+      { status: status },
+      { new: true, runValidators: true }
     );
 
-    // 6. Handle Task Not Found by findByIdAndUpdate
     if (!updatedTask) {
       console.log(`Task with ID ${taskId} not found for update.`);
       return res.status(404).json({ message: `Task with ID ${taskId} not found.` });
     }
-
     console.log('Task updated:', updatedTask);
-    res.status(200).json(updatedTask); // Send back the updated task
-
+    res.status(200).json(updatedTask);
   } catch (error) {
     console.error(`Error updating task ${taskId}:`, error);
-     // Handle potential validation errors from Mongoose during update
     if (error.name === 'ValidationError') {
         return res.status(400).json({ message: 'Validation Error', errors: error.errors });
     }
-    // Handle potential CastError if the taskId format is invalid for ObjectId
     if (error.name === 'CastError') {
         return res.status(400).json({ message: 'Invalid Task ID format.' });
     }
@@ -139,4 +121,3 @@ app.get('/', (req, res) => {
 });
 
 // --- Start Server (Moved inside mongoose.connect().then() ) ---
-// app.listen is called within the mongoose.connect().then() block above

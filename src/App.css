@@ -1,4 +1,4 @@
-/* App.css */
+/* src/App.css */
 
 /* Basic App Layout */
 .app-container {
@@ -7,7 +7,7 @@
 }
 
 .app-header {
-  background-color: #333; /* Darker header */
+  background-color: #333;
   color: white;
   padding: 1rem 1.5rem;
   text-align: center;
@@ -23,17 +23,17 @@
 
 /* Main content area */
 .app-main {
-  padding: 0 1.5rem 1.5rem; /* Padding around main content */
-  max-width: 1200px; /* Optional: Max width for larger screens */
-  margin: 0 auto; /* Center content */
+  padding: 0 1.5rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* Form Styling */
 .add-task-form {
   width: 100%;
   display: flex;
-  gap: 0.75rem; /* Space between input and button */
-  margin-bottom: 1.5rem; /* Space below form */
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .add-task-form input[type="text"] {
@@ -43,6 +43,10 @@
   border-radius: 5px;
   font-size: 1rem;
 }
+.add-task-form input:disabled {
+  background-color: #eee;
+}
+
 
 .add-task-form button {
   padding: 0.6rem 1.2rem;
@@ -60,29 +64,33 @@
 .add-task-form button:hover {
   background-color: #0056b3;
 }
+.add-task-form button:disabled {
+  background-color: #a0cfff;
+  cursor: not-allowed;
+}
 
 
-/* Columns Container - THIS IS THE FLEX CONTAINER */
+/* Columns Container - FLEX CONTAINER */
 .columns-container {
-  display: flex; /* Arrange columns horizontally */
-  gap: 1.5rem; /* Space BETWEEN columns */
+  display: flex;
+  gap: 1.5rem;
   width: 100%;
-  align-items: flex-start; /* Align columns at the top */
+  align-items: flex-start;
 }
 
 
 /* Generic Column Styling */
 .column {
-  flex: 1; /* Each column shares space equally */
-  min-width: 280px; /* Minimum width before wrapping */
-  background-color: #f4f5f7; /* Trello-like background */
+  flex: 1;
+  min-width: 280px;
+  background-color: #f4f5f7;
   border-radius: 6px;
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem; /* Space between items INSIDE column */
+  gap: 0.75rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  transition: background-color 0.2s ease; /* For drag over feedback */
+  transition: background-color 0.2s ease;
 }
 
 /* Column Headers */
@@ -91,9 +99,9 @@
   padding-bottom: 0.75rem;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #172b4d; /* Trello-like text color */
+  color: #172b4d;
   text-align: center;
-  border-bottom: 1px solid #dfe1e6; /* Subtle separator */
+  border-bottom: 1px solid #dfe1e6;
   flex-shrink: 0;
 }
 
@@ -102,20 +110,19 @@
   background-color: white;
   border-radius: 4px;
   padding: 0.75rem 1rem;
-  box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25); /* Trello-like shadow */
+  box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25);
   cursor: grab;
   transition: box-shadow 0.2s ease-in-out, background-color 0.2s ease;
   font-size: 0.95rem;
   color: #172b4d;
-  word-wrap: break-word; /* Prevent long words overflowing */
+  word-wrap: break-word;
 }
 
 .task-card:hover {
-   background-color: #f4f5f7; /* Slight hover effect */
+   background-color: #f4f5f7;
    box-shadow: 0 2px 4px rgba(9, 30, 66, 0.25);
 }
 
-/* Style for when a task is being actively dragged */
 .task-card:active {
   cursor: grabbing;
 }
@@ -131,8 +138,7 @@
   font-size: 0.9rem;
 }
 
-/* Optional: Visual feedback for column being dragged over */
+/* Visual feedback for column being dragged over */
 .column-drag-over {
   background-color: #e6efff; /* Light blue highlight */
 }
-
