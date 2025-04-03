@@ -8,12 +8,13 @@ import './App.css';
 const API_BASE_URL = 'http://localhost:3001/api';
 
 function App() {
-  // State for tasks, new task input, loading, errors, and submitting status
+  // State for tasks, new task input, loading, errors, submitting, and deleting status
   const [tasks, setTasks] = useState([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(null); // Track task being deleted by _id
 
   // --- Fetch Initial Tasks Hook ---
   useEffect(() => {
@@ -75,7 +76,7 @@ function App() {
     if (e.target) e.target.style.opacity = '1';
     // Clean up column highlight class
     document.querySelectorAll('.column-drag-over').forEach(el => {
-        el.classList.remove('column-drag-over');
+      el.classList.remove('column-drag-over');
     });
   };
 
@@ -118,11 +119,28 @@ function App() {
         )
       );
       console.log(`Task ${taskId} status updated successfully.`);
-
     } catch (err) {
       console.error(`Error updating task ${taskId} status:`, err);
       setError(err.response?.data?.message || `Failed to update task status.`);
-      // Task will visually remain in original column due to lack of optimistic update
+    }
+  };
+
+  // --- Handle Delete Task ---
+  const handleDelete = async (taskId) => {
+    setError(null);
+    setIsDeleting(taskId); // Set the task being deleted
+
+    try {
+      // Send DELETE request to backend
+      await axios.delete(`${API_BASE_URL}/tasks/${taskId}`);
+      // Update frontend state by removing the deleted task
+      setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
+      console.log(`Task ${taskId} deleted successfully.`);
+    } catch (err) {
+      console.error(`Error deleting task ${taskId}:`, err);
+      setError(err.response?.data?.message || `Failed to delete task ${taskId}.`);
+    } finally {
+      setIsDeleting(null); // Reset after completion
     }
   };
 
@@ -171,14 +189,22 @@ function App() {
               <h2>To Do</h2>
               {todoTasks.map(task => (
                 <div
-                  key={task._id} // Use MongoDB _id
-                  id={task._id}   // Use MongoDB _id
+                  key={task._id}
+                  id={task._id}
                   className="task-card"
                   draggable="true"
-                  onDragStart={(e) => handleDragStart(e, task._id)} // Pass _id
+                  onDragStart={(e) => handleDragStart(e, task._id)}
                   onDragEnd={handleDragEnd}
                 >
-                  {task.title}
+                  <span>{task.title}</span>
+                  <button
+                    onClick={() => handleDelete(task._id)}
+                    className="delete-button"
+                    aria-label={`Delete task: ${task.title}`}
+                    disabled={isDeleting === task._id}
+                  >
+                    {isDeleting === task._id ? 'Deleting...' : '✕'}
+                  </button>
                 </div>
               ))}
               {todoTasks.length === 0 && !isLoading && <div className="empty-column-placeholder">Drop tasks here</div>}
@@ -202,7 +228,15 @@ function App() {
                   onDragStart={(e) => handleDragStart(e, task._id)}
                   onDragEnd={handleDragEnd}
                 >
-                  {task.title}
+                  <span>{task.title}</span>
+                  <button
+                    onClick={() => handleDelete(task._id)}
+                    className="delete-button"
+                    aria-label={`Delete task: ${task.title}`}
+                    disabled={isDeleting === task._id}
+                  >
+                    {isDeleting === task._id ? 'Deleting...' : '✕'}
+                  </button>
                 </div>
               ))}
               {inProgressTasks.length === 0 && !isLoading && <div className="empty-column-placeholder">Drop tasks here</div>}
@@ -226,7 +260,15 @@ function App() {
                   onDragStart={(e) => handleDragStart(e, task._id)}
                   onDragEnd={handleDragEnd}
                 >
-                  {task.title}
+                  <span>{task.title}</span>
+                  <button
+                    onClick={() => handleDelete(task._id)}
+                    className="delete-button"
+                    aria-label={`Delete task: ${task.title}`}
+                    disabled={isDeleting === task._id}
+                  >
+                    {isDeleting === task._id ? 'Deleting...' : '✕'}
+                  </button>
                 </div>
               ))}
               {doneTasks.length === 0 && !isLoading && <div className="empty-column-placeholder">Drop tasks here</div>}

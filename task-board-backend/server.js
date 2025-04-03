@@ -3,8 +3,9 @@
 // 1. Import Dependencies
 const express = require('express');
 const mongoose = require('mongoose');
-const Task = require('./models/Task');
+const Task = require('./models/task');
 const cors = require('cors'); // Import CORS package
+require('dotenv').config();
 
 // 2. Create Express App Instance
 const app = express();
@@ -14,8 +15,7 @@ const PORT = process.env.PORT || 3001;
 
 // --- MongoDB Connection String ---
 // !!! REPLACE WITH YOUR ACTUAL CONNECTION STRING !!!
-const MONGO_URI = 'mongodb+srv://skean2000:<db_password>@cluster0.xfnkesd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-// OR for local: const MONGO_URI = 'mongodb://localhost:27017/taskBoardDb';
+const MONGO_URI = process.env.MONGO_URI;// OR for local: const MONGO_URI = 'mongodb://localhost:27017/taskBoardDb';
 // ---------------------------------
 
 // --- Middleware ---
@@ -71,7 +71,7 @@ app.post('/api/tasks', async (req, res) => {
   } catch (error) {
     console.error('Error creating task:', error);
     if (error.name === 'ValidationError') {
-        return res.status(400).json({ message: 'Validation Error', errors: error.errors });
+      return res.status(400).json({ message: 'Validation Error', errors: error.errors });
     }
     res.status(500).json({ message: 'Error creating task in database.' });
   }
@@ -86,7 +86,7 @@ app.patch('/api/tasks/:taskId', async (req, res) => {
 
   const validStatuses = ['todo', 'in-progress', 'done'];
   if (!status || !validStatuses.includes(status)) {
-      return res.status(400).json({ message: `Invalid status provided. Must be one of: ${validStatuses.join(', ')}` });
+    return res.status(400).json({ message: `Invalid status provided. Must be one of: ${validStatuses.join(', ')}` });
   }
 
   try {
@@ -105,19 +105,40 @@ app.patch('/api/tasks/:taskId', async (req, res) => {
   } catch (error) {
     console.error(`Error updating task ${taskId}:`, error);
     if (error.name === 'ValidationError') {
-        return res.status(400).json({ message: 'Validation Error', errors: error.errors });
+      return res.status(400).json({ message: 'Validation Error', errors: error.errors });
     }
     if (error.name === 'CastError') {
-        return res.status(400).json({ message: 'Invalid Task ID format.' });
+      return res.status(400).json({ message: 'Invalid Task ID format.' });
     }
     res.status(500).json({ message: 'Error updating task in database.' });
   }
 });
-// ----------------------------------------------------
+
+// DELETE /api/tasks/:taskId - Delete a task from DB
+app.delete('/api/tasks/:taskId', async (req, res) => {
+  const taskId = req.params.taskId;
+  console.log(`Request received for DELETE /api/tasks/${taskId}`);
+
+  try {
+    const deletedTask = await Task.findByIdAndDelete(taskId);
+
+    if (!deletedTask) {
+      console.log(`Task with ID ${taskId} not found for deletion.`);
+      return res.status(404).json({ message: `Task with ID ${taskId} not found.` });
+    }
+
+    console.log('Task deleted:', deletedTask);
+    res.status(200).json({ message: `Task ${taskId} deleted successfully.`, deletedTask });
+  } catch (error) {
+    console.error(`Error deleting task ${taskId}:`, error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid Task ID format.' });
+    }
+    res.status(500).json({ message: 'Error deleting task from database.' });
+  }
+});
 
 // --- Catch-all Route ---
 app.get('/', (req, res) => {
   res.send('Hello from Task Board Backend! Database connection established.');
 });
-
-// --- Start Server (Moved inside mongoose.connect().then() ) ---
