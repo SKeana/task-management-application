@@ -1,2 +1,4 @@
 *:Zone.Identifier
 node_modules/
+MONGO_URI=mongodb://localhost:27017/taskBoardDb
+PORT=3001
