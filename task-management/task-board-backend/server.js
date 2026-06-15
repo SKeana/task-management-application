@@ -3,7 +3,7 @@
 // 1. Import Dependencies
 const express = require('express');
 const mongoose = require('mongoose');
-const Task = require('./models/task');
+const Task = require('./models/Task');
 const cors = require('cors'); // Import CORS package
 require('dotenv').config();
 
