@@ -60,12 +60,14 @@ app.post('/api/tasks', async (req, res) => {
   console.log('Request received for POST /api/tasks');
   console.log('Request Body:', req.body);
   try {
-    const { title } = req.body;
+    const { title, dueDate, reminderAt } = req.body;
     if (!title || typeof title !== 'string' || title.trim() === '') {
       return res.status(400).json({ message: 'Task title is required.' });
     }
-    const newTask = new Task({ title: title.trim() });
+    const newTask = new Task({ title: title.trim(), dueDate, reminderAt });
     const savedTask = await newTask.save();
+    const dueDate = savedTask.dueDate ? new Date(savedTask.dueDate).toLocaleString() : 'No due date';
+    const reminderAt = savedTask.reminderAt ? new Date(savedTask.reminderAt).toLocaleString() : 'No reminder set';
     console.log('Task saved:', savedTask);
     res.status(201).json(savedTask);
   } catch (error) {
