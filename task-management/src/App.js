@@ -11,6 +11,8 @@ function App() {
   // State for tasks, new task input, loading, errors, submitting, and deleting status
   const [tasks, setTasks] = useState([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newDueDate, setNewDueDate] = useState("");
+  const [newReminderAt, setNewReminderAt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,12 +52,16 @@ function App() {
     try {
       // Send POST request to backend
       const response = await axios.post(`${API_BASE_URL}/tasks`, {
-        title: trimmedTitle
+        title: trimmedTitle,
+        dueDate: newDueDate || undefined,
+        reminderAt: newReminderAt || undefined,
       });
       const newlyCreatedTask = response.data; // Get task created by backend
       // Add the new task (from backend response) to frontend state
       setTasks(prevTasks => [...prevTasks, newlyCreatedTask]);
-      setNewTaskTitle(""); // Clear input
+      setNewTaskTitle("");
+      setNewDueDate("");
+      setNewReminderAt("");
     } catch (err) {
       console.error("Error adding task:", err);
       setError(err.response?.data?.message || "Failed to add task.");
@@ -148,6 +154,7 @@ function App() {
   const todoTasks = tasks.filter(task => task.status === 'todo');
   const inProgressTasks = tasks.filter(task => task.status === 'in-progress');
   const doneTasks = tasks.filter(task => task.status === 'done');
+  
 
   // --- Rendering ---
   return (
@@ -164,6 +171,20 @@ function App() {
             value={newTaskTitle}
             onChange={(e) => setNewTaskTitle(e.target.value)}
             aria-label="New task title"
+            disabled={isSubmitting}
+          />
+          <input
+            type='datetime-local'
+            value={newDueDate}
+            onChange={(e) => setNewDueDate(e.target.value)}
+            aria-label='Due date'
+            disabled={isSubmitting}
+          />
+          <input
+            type='datetime-local'
+            value={newReminderAt}
+            onChange={(e) => setNewReminderAt(e.target.value)}
+            aria-label='Reminder At'
             disabled={isSubmitting}
           />
           <button type='submit' disabled={isSubmitting}>
@@ -205,6 +226,11 @@ function App() {
                   >
                     {isDeleting === task._id ? 'Deleting...' : '✕'}
                   </button>
+                  {task.dueDate && (
+                    <small className="task-due">
+                    Due: {new Date(task.dueDate).toLocaleString()}
+                  </small>
+)}
                 </div>
               ))}
               {todoTasks.length === 0 && !isLoading && <div className="empty-column-placeholder">Drop tasks here</div>}
@@ -237,6 +263,11 @@ function App() {
                   >
                     {isDeleting === task._id ? 'Deleting...' : '✕'}
                   </button>
+                  {task.dueDate && (
+                    <small className="task-due">
+                      Due: {new Date(task.dueDate).toLocaleString()}
+                    </small>
+                  )}
                 </div>
               ))}
               {inProgressTasks.length === 0 && !isLoading && <div className="empty-column-placeholder">Drop tasks here</div>}
@@ -269,6 +300,11 @@ function App() {
                   >
                     {isDeleting === task._id ? 'Deleting...' : '✕'}
                   </button>
+                  {task.dueDate && (
+                    <small className="task-due">
+                      Due: {new Date(task.dueDate).toLocaleString()}
+                    </small>
+                  )}
                 </div>
               ))}
               {doneTasks.length === 0 && !isLoading && <div className="empty-column-placeholder">Drop tasks here</div>}
