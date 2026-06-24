@@ -66,8 +66,6 @@ app.post('/api/tasks', async (req, res) => {
     }
     const newTask = new Task({ title: title.trim(), dueDate, reminderAt });
     const savedTask = await newTask.save();
-    const dueDate = savedTask.dueDate ? new Date(savedTask.dueDate).toLocaleString() : 'No due date';
-    const reminderAt = savedTask.reminderAt ? new Date(savedTask.reminderAt).toLocaleString() : 'No reminder set';
     console.log('Task saved:', savedTask);
     res.status(201).json(savedTask);
   } catch (error) {
@@ -82,19 +80,23 @@ app.post('/api/tasks', async (req, res) => {
 // PATCH /api/tasks/:taskId - Update task status in DB
 app.patch('/api/tasks/:taskId', async (req, res) => {
   const taskId = req.params.taskId;
-  const { status } = req.body;
+  const { status, dueDate, reminderAt } = req.body;
+  const update = {};
+  if (status !== undefined) update.status = status;
+  if (dueDate !== undefined) update.dueDate = dueDate;
+  if (reminderAt !== undefined) update.reminderAt = reminderAt;
   console.log(`Request received for PATCH /api/tasks/${taskId}`);
   console.log('Request Body:', req.body);
 
   const validStatuses = ['todo', 'in-progress', 'done'];
-  if (!status || !validStatuses.includes(status)) {
+  if (status !== undefined && !validStatuses.includes(status)) {
     return res.status(400).json({ message: `Invalid status provided. Must be one of: ${validStatuses.join(', ')}` });
   }
 
   try {
     const updatedTask = await Task.findByIdAndUpdate(
       taskId,
-      { status: status },
+      update,
       { new: true, runValidators: true }
     );
 
